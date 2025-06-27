@@ -1,0 +1,10 @@
+[package]
+name = "evmap"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+macroquad = { version = "0.4", features = ["glam-serde"] }
+
+serde = { version = "1.0", features = ["derive"] }
+ron = "0.10"
