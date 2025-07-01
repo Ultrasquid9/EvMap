@@ -2,56 +2,22 @@ use std::error::Error;
 
 use macroquad::prelude::*;
 
-use crate::{
-	map::Map,
-	walls::{draw_map_walls, index_to_insert_at, nearest_point},
-};
+use crate::{editor::Editor, map::Map};
 
+mod editor;
 mod map;
+mod tilemap;
 mod walls;
 
 type EvMapResult = Result<(), Box<dyn Error>>;
 
 #[macroquad::main("EvMap")]
 async fn main() -> EvMapResult {
-	let mut map = Map::default();
-	map.walls.push(vec![]);
-
-	let mut drag_index: Option<usize> = None;
+	let mut editor = Editor::new();
 
 	loop {
-		draw_map_walls(&map);
-
-		if is_mouse_button_pressed(MouseButton::Left) {
-			let index = index_to_insert_at(&map).unwrap_or_default();
-			map.walls
-				.first_mut()
-				.unwrap()
-				.insert(index, mouse_pos_vec());
-		}
-
-		if is_mouse_button_pressed(MouseButton::Right) {
-			drag_index = nearest_point(&map);
-		}
-
-		if is_mouse_button_down(MouseButton::Right)
-			&& let Some(index) = drag_index
-			&& let Some(wall) = map.walls.first_mut()
-			&& let Some(point) = wall.get_mut(index)
-		{
-			*point = mouse_pos_vec();
-		}
-
-		if is_mouse_button_pressed(MouseButton::Middle)
-			&& let Some(point) = nearest_point(&map)
-			&& let Some(wall) = map.walls.first_mut()
-		{
-			wall.remove(point);
-		}
-
-		if is_key_pressed(KeyCode::S) {
-			save_map(&map)?;
-		}
+		editor.draw();
+		editor.control()?;
 
 		next_frame().await
 	}

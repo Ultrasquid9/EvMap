@@ -1,12 +1,15 @@
 use macroquad::math::Vec2;
 use serde::{Deserialize, Serialize};
 
+use crate::tilemap::TileMap;
+
 #[derive(Serialize, Deserialize, Default, Clone)]
 pub struct Map {
 	pub walls: Vec<Vec<Vec2>>,
 	pub doors: Vec<Door>,
 	pub enemies: Vec<(String, Vec2)>,
 	pub npcs: Vec<(String, Vec2)>,
+	pub tilemap: TileMap,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
