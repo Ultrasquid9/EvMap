@@ -9,21 +9,23 @@ mod map;
 mod tilemap;
 mod walls;
 
-type EvMapResult = Result<(), Box<dyn Error>>;
+pub type DynResult<T> = Result<T, Box<dyn Error>>;
 
 #[macroquad::main("EvMap")]
-async fn main() -> EvMapResult {
-	let mut editor = Editor::new();
+async fn main() -> DynResult<()> {
+	let mut editor = Editor::with_file("map.ron")
+		.await
+		.unwrap_or(Editor::new().await);
 
 	loop {
 		editor.draw();
-		editor.control()?;
+		editor.control().await?;
 
 		next_frame().await
 	}
 }
 
-fn save_map(map: &Map) -> EvMapResult {
+fn save_map(map: &Map) -> DynResult<()> {
 	let cfg = ron::ser::PrettyConfig::new().indentor("\t");
 	let ron = ron::ser::to_string_pretty(&map, cfg)?;
 
